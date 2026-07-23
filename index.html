@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Auditoría Herramientas Bioingeniería HI</title>
-    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="icon" type="image/png" href="img/favicon.png">
     <style>
         @font-face {
             font-family: 'Inter';
@@ -318,9 +318,12 @@
         <button class="back-btn hidden" id="back-btn" onclick="goBack()" aria-label="Volver">
             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         </button>
-        <div class="header-content" style="display:flex; align-items:center; justify-content:center; gap: 10px;">
-            <img id="header-logo" src="/img/hi_icon.png" alt="Logo" style="width: 26px; height: 26px; object-fit: contain; border-radius: 4px;">
-            <h1 id="header-title">Auditoría de Herramientas Bioingeniería</h1>
+        <div class="header-content" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div style="display:flex; align-items:center; gap: 10px;">
+                <img id="header-logo" src="img/hi_icon.png" alt="Logo" style="width: 26px; height: 26px; object-fit: contain; border-radius: 4px;">
+                <h1 id="header-title">Auditoría de Herramientas Bioingeniería</h1>
+            </div>
+            <div id="update-indicator" style="font-size: 0.75rem; color: var(--primary); font-weight: 700; opacity: 0; transition: opacity 0.3s; margin-top: 2px;">Sincronizando con la nube <span class="dot syncing" style="margin-left: 2px;"></span></div>
         </div>
         <div class="header-actions" style="display:flex; gap:8px;">
             <button class="add-tool-btn" onclick="openAddToolModal()" aria-label="Agregar Herramienta">
@@ -445,6 +448,13 @@
     </div>
 
     <script>
+        function esc(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
         // CONFIGURACIÓN DE LA API (Google Apps Script)
         const API_URL = "https://script.google.com/macros/s/AKfycbzfwQeQOj8hvmLluhGV4MXGbNcX3iP3vlxqjPk6HE2dM0egWzWmeTvU7Fi-bN-0ZUwYdA/exec";
         
@@ -461,6 +471,8 @@
         document.addEventListener('DOMContentLoaded', initApp);
 
         async function initApp() {
+            window.addEventListener('offline', () => showToast('Sin conexión a internet', 'error'));
+            window.addEventListener('online', () => showToast('Conexión restablecida', 'success'));
             initTheme();
             showSkeletons();
             
@@ -520,7 +532,7 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = `<span class="toast-message">${message}</span>`;
+            toast.innerHTML = `<span class="toast-message">${esc(message)}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('visible'), 10);
             setTimeout(() => {
@@ -547,8 +559,8 @@
                 const progressPercent = total > 0 ? ((total - faltantes) / total) * 100 : 0;
                 
                 container.innerHTML += `
-                    <div class="caja-card" onclick="openCaja('${caja}')">
-                        <div class="caja-title">${caja}</div>
+                    <div class="caja-card" onclick="openCaja('${esc(caja)}')">
+                        <div class="caja-title">${esc(caja)}</div>
                         <div class="caja-status">${faltantes} faltantes de ${total}</div>
                         <div class="progress-container"><div class="progress-bar" style="width: ${progressPercent}%"></div></div>
                     </div>
@@ -662,13 +674,13 @@
                     <div class="item-card ${cardClass}" id="card-${currentCaja}-${index}">
                         <div class="item-info">
                             <div class="item-header">
-                                <span class="item-name" onclick="openModal(${index})">${tool.nombre}</span>
+                                <span class="item-name" onclick="openModal(${index})">${esc(tool.nombre)}</span>
                                 <div class="info-icon" onclick="openModal(${index})">
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                 </div>
                             </div>
                             <div class="item-details">
-                                ${tool.marca_modelo || 'Sin marca/modelo'} • ${tool.detalles_medida || 'Sin medida'}
+                                ${esc(tool.marca_modelo) || 'Sin marca/modelo'} • ${esc(tool.detalles_medida) || 'Sin medida'}
                             </div>
                         </div>
                         <button class="toggle-btn ${btnClass}" id="btn-${currentCaja}-${index}" onclick="toggleTool(${index})">
@@ -741,11 +753,11 @@
                             `<svg viewBox="0 0 24 24" width="16" height="16" stroke="white" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
                         
                         resultsHTML += `
-                            <div class="item-card" onclick="openCajaAndHighlight('${caja}', ${index})" style="cursor: pointer;">
+                            <div class="item-card" onclick="openCajaAndHighlight('${esc(caja)}', ${index})" style="cursor: pointer;">
                                 <div class="item-info">
-                                    <span style="font-size: 0.7rem; background-color: var(--bg-color); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; border: 1px solid var(--border-color); font-weight: 600;">${caja}</span>
-                                    <div class="item-name">${tool.nombre}</div>
-                                    <div class="item-details">${tool.marca_modelo || 'Sin marca'} • ${tool.detalles_medida || 'Sin medida'}</div>
+                                    <span style="font-size: 0.7rem; background-color: var(--bg-color); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; border: 1px solid var(--border-color); font-weight: 600;">${esc(caja)}</span>
+                                    <div class="item-name">${esc(tool.nombre)}</div>
+                                    <div class="item-details">${esc(tool.marca_modelo) || 'Sin marca'} • ${esc(tool.detalles_medida) || 'Sin medida'}</div>
                                 </div>
                                 <div style="background-color: ${statusColor}; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem;">
                                     ${tool.present ? 'Presente' : 'Faltante'}
@@ -763,7 +775,29 @@
             }
         }
 
+        function showSyncStatus(status) {
+            const indicator = document.getElementById('update-indicator');
+            if (status === 'syncing') {
+                indicator.innerHTML = `Sincronizando con la nube <span class="dot syncing" style="margin-left: 2px;"></span>`;
+                indicator.style.color = 'var(--primary)';
+                indicator.style.opacity = '1';
+            } else if (status === 'success') {
+                indicator.innerHTML = `¡Guardado! <span class="dot online" style="margin-left: 2px;"></span>`;
+                indicator.style.color = 'var(--green)';
+                setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+            } else if (status === 'error') {
+                indicator.innerHTML = `Error, intenta de nuevo <span class="dot error" style="margin-left: 2px;"></span>`;
+                indicator.style.color = 'var(--red)';
+                setTimeout(() => { indicator.style.opacity = '0'; }, 3500);
+            }
+        }
+
         async function toggleTool(index) {
+            if (!window.isUpdatingTool) window.isUpdatingTool = {};
+            const key = `${currentCaja}-${index}`;
+            if (window.isUpdatingTool[key]) return;
+            window.isUpdatingTool[key] = true;
+
             const tool = herramientasData[currentCaja][index];
             const originalState = tool.present;
             const originalEstado = tool.estado;
@@ -778,10 +812,12 @@
             updateToolCardState(index, newState);
             
             try {
+                showSyncStatus('syncing');
                 const payload = {
                     action: "update",
                     id: tool.id,
-                    estado: newEstado
+                    estado: newEstado,
+                    token: "temp-update-token"
                 };
 
                 const response = await fetch(API_URL, {
@@ -792,18 +828,21 @@
                 
                 if (!response.ok) throw new Error("Error en red");
                 
+                showSyncStatus('success');
                 if (activeFilter !== 'all') {
                     setTimeout(renderTools, 300);
                 }
             } catch(e) {
                 console.error('[toggleTool] Error al guardar:', e);
-                
+                showSyncStatus('error');
                 showToast(`Error al guardar. Revertido.`, 'error');
                 
                 // Revertir estado localmente por fallo
                 tool.present = originalState;
                 tool.estado = originalEstado;
                 updateToolCardState(index, originalState);
+            } finally {
+                delete window.isUpdatingTool[key];
             }
         }
 
@@ -830,14 +869,19 @@
             const tool = herramientasData[currentCaja][index];
             document.getElementById('modal-title').textContent = tool.nombre;
             document.getElementById('modal-desc').innerHTML = `
-                <div style="margin-bottom: 8px;"><strong>Marca / Modelo:</strong> ${tool.marca_modelo || 'Sin especificar'}</div>
-                <div style="margin-bottom: 8px;"><strong>Medidas / Detalles:</strong> ${tool.detalles_medida || 'Sin especificar'}</div>
+                <div style="margin-bottom: 8px;"><strong>Marca / Modelo:</strong> ${esc(tool.marca_modelo) || 'Sin especificar'}</div>
+                <div style="margin-bottom: 8px;"><strong>Medidas / Detalles:</strong> ${esc(tool.detalles_medida) || 'Sin especificar'}</div>
                 <div><strong>Estado:</strong> <span style="font-weight:700; color: ${tool.present ? 'var(--green)' : 'var(--red)'}">${tool.present ? 'Presente' : 'Faltante'}</span></div>
             `;
             
             const imgContainer = document.getElementById('modal-img-container');
             if (tool.url_imagen && tool.url_imagen !== "") {
-                imgContainer.innerHTML = `<img src="${tool.url_imagen}" class="modal-img" alt="${tool.nombre}" onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\\'color:var(--text-muted);font-size:0.9rem;display:flex;flex-direction:column;align-items:center;gap:8px\\'><svg width=\\'40\\' height=\\'40\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z\\'/></svg>Imagen no disponible</div>'">`;
+                let displayUrl = tool.url_imagen;
+                // Google Drive bloquea uc?id en etiquetas img en navegadores modernos. Usamos el endpoint thumbnail.
+                if (displayUrl.includes('drive.google.com/uc?id=')) {
+                    displayUrl = displayUrl.replace('drive.google.com/uc?id=', 'drive.google.com/thumbnail?id=') + '&sz=w800';
+                }
+                imgContainer.innerHTML = `<img src="${displayUrl}" class="modal-img" alt="${esc(tool.nombre)}" onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\\'color:var(--text-muted);font-size:0.9rem;display:flex;flex-direction:column;align-items:center;gap:8px\\'><svg width=\\'40\\' height=\\'40\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z\\'/></svg>Imagen no disponible</div>'">`;
             } else {
                 imgContainer.innerHTML = `<div style="color:var(--text-muted);font-size:0.9rem;display:flex;flex-direction:column;align-items:center;gap:8px;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>Sin imagen cargada</div>`;
             }
@@ -917,11 +961,6 @@
             const detalles = document.getElementById('new-tool-detalles').value.trim();
             const password = document.getElementById('new-tool-password').value;
             const fileInput = document.getElementById('new-tool-img');
-            
-            if(password !== "11" && password !== "123123") {
-                showToast("Contraseña incorrecta. No autorizado.", "error");
-                return;
-            }
 
             if(!caja || !nombre || !marca) {
                 showToast("Por favor completa los campos obligatorios.", "error");
@@ -945,6 +984,7 @@
 
             const sendData = async () => {
                 try {
+                    showSyncStatus('syncing');
                     const response = await fetch(API_URL, {
                         method: 'POST',
                         body: JSON.stringify(payload),
@@ -958,6 +998,7 @@
                         throw new Error(data.message);
                     }
                     
+                    showSyncStatus('success');
                     showToast("Herramienta agregada exitosamente", "success");
                     closeAddToolModal(null, true);
                     
@@ -965,6 +1006,7 @@
                     initApp(); 
                 } catch (error) {
                     console.error(error);
+                    showSyncStatus('error');
                     showToast("Error al guardar: " + error.message, "error");
                 } finally {
                     btnSubmit.textContent = "Guardar Herramienta";
