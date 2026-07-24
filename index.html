@@ -775,20 +775,32 @@
             }
         }
 
+        window.activeSyncs = 0;
+        window.syncTimeout = null;
+
         function showSyncStatus(status) {
             const indicator = document.getElementById('update-indicator');
+            
             if (status === 'syncing') {
+                window.activeSyncs++;
+                clearTimeout(window.syncTimeout);
                 indicator.innerHTML = `Sincronizando con la nube <span class="dot syncing" style="margin-left: 2px;"></span>`;
                 indicator.style.color = 'var(--primary)';
                 indicator.style.opacity = '1';
-            } else if (status === 'success') {
-                indicator.innerHTML = `¡Guardado! <span class="dot online" style="margin-left: 2px;"></span>`;
-                indicator.style.color = 'var(--green)';
-                setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
-            } else if (status === 'error') {
-                indicator.innerHTML = `Error, intenta de nuevo <span class="dot error" style="margin-left: 2px;"></span>`;
-                indicator.style.color = 'var(--red)';
-                setTimeout(() => { indicator.style.opacity = '0'; }, 3500);
+            } else {
+                window.activeSyncs--;
+                if (window.activeSyncs <= 0) {
+                    window.activeSyncs = 0; // por si acaso
+                    if (status === 'success') {
+                        indicator.innerHTML = `¡Guardado! <span class="dot online" style="margin-left: 2px;"></span>`;
+                        indicator.style.color = 'var(--green)';
+                    } else if (status === 'error') {
+                        indicator.innerHTML = `Error, intenta de nuevo <span class="dot error" style="margin-left: 2px;"></span>`;
+                        indicator.style.color = 'var(--red)';
+                    }
+                    clearTimeout(window.syncTimeout);
+                    window.syncTimeout = setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+                }
             }
         }
 
@@ -811,6 +823,9 @@
             // 2. Actualizar visualmente la tarjeta al instante
             updateToolCardState(index, newState);
             
+            const btn = document.getElementById(`btn-${currentCaja}-${index}`);
+            if(btn) btn.classList.add('btn-loading');
+
             try {
                 showSyncStatus('syncing');
                 const payload = {
@@ -843,6 +858,7 @@
                 updateToolCardState(index, originalState);
             } finally {
                 delete window.isUpdatingTool[key];
+                if(btn) btn.classList.remove('btn-loading');
             }
         }
 
@@ -927,6 +943,15 @@
         // ---------- AÑADIR NUEVA HERRAMIENTA ----------
         function openAddToolModal() {
             document.getElementById('add-tool-form').reset();
+            
+            const select = document.getElementById('new-tool-caja');
+            select.innerHTML = '';
+            const cajas = Object.keys(herramientasData).sort();
+            cajas.forEach(caja => {
+                select.innerHTML += `<option value="${esc(caja)}">${esc(caja)}</option>`;
+            });
+            select.innerHTML += `<option value="OTRA">Otra...</option>`;
+            
             document.getElementById('new-tool-caja-otra').style.display = 'none';
             document.getElementById('new-tool-caja-otra').required = false;
             document.getElementById('add-tool-modal').classList.add('active');
