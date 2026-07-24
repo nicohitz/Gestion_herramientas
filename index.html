@@ -95,9 +95,13 @@
 
         header {
             background-color: var(--header-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 12px 16px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10;
+            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10;
+            transition: background-color 0.3s, border-color 0.3s; width: 100%;
+        }
+        
+        .header-inner {
+            max-width: 600px; margin: 0 auto; padding: 12px 16px; width: 100%;
             display: flex; justify-content: space-between; align-items: center; min-height: 72px;
-            transition: background-color 0.3s, border-color 0.3s;
         }
         
         .header-content {
@@ -113,7 +117,7 @@
         .back-btn:hover { background-color: var(--border-color); }
         .back-btn.hidden { display: none !important; }
 
-        h1 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.2; text-align: left; }
+        h1 { font-size: 1.15rem; font-weight: 700; color: var(--text-main); line-height: 1.2; text-align: left; }
         .subtitle { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; }
 
         .container { max-width: 600px; margin: 16px auto; padding: 0 16px; }
@@ -318,24 +322,26 @@
 </head>
 <body>
     <header>
-        <button class="back-btn hidden" id="back-btn" onclick="goBack()" aria-label="Volver">
-            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        </button>
-        <div class="header-content" style="align-items: flex-start; text-align: left; margin-left: 0;">
-            <div id="header-title-container" style="display:flex; align-items:center; gap: 8px; justify-content: flex-start; width: 100%;">
-                <img id="header-logo" src="img/hi_icon.png" alt="Logo" style="width: 24px; height: 24px; object-fit: contain; border-radius: 4px; flex-shrink: 0;">
-                <h1 id="header-title">Gestión Herramientas Bioingeniería</h1>
+        <div class="header-inner">
+            <button class="back-btn hidden" id="back-btn" onclick="goBack()" aria-label="Volver">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <div id="header-content-box" class="header-content" style="align-items: flex-start; text-align: left; margin-left: 0;">
+                <div id="header-title-container" style="display:flex; align-items:center; gap: 8px; justify-content: flex-start; width: 100%;">
+                    <img id="header-logo" src="img/hi_icon.png" alt="Logo" style="width: 24px; height: 24px; object-fit: contain; border-radius: 4px; flex-shrink: 0;">
+                    <h1 id="header-title">Gestión Herramientas Bioingeniería</h1>
+                </div>
+                <div id="update-indicator" style="font-size: 0.7rem; color: var(--primary); font-weight: 700; opacity: 0; transition: opacity 0.3s; margin-top: 2px; display: none;">Sincronizando <span class="dot syncing" style="margin-left: 2px;"></span></div>
             </div>
-            <div id="update-indicator" style="font-size: 0.7rem; color: var(--primary); font-weight: 700; opacity: 0; transition: opacity 0.3s; margin-top: 2px; display: none;">Sincronizando <span class="dot syncing" style="margin-left: 2px;"></span></div>
-        </div>
-        <div class="header-actions" style="display:flex; gap:8px; z-index: 2; flex-shrink: 0;">
-            <button class="add-tool-btn" onclick="openAddToolModal()" aria-label="Agregar Herramienta">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
-                <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.22" x2="5.64" y2="17.78"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
+            <div class="header-actions" style="display:flex; gap:8px; z-index: 2; flex-shrink: 0;">
+                <button class="add-tool-btn" onclick="openAddToolModal()" aria-label="Agregar Herramienta">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.22" x2="5.64" y2="17.78"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -555,6 +561,8 @@
             document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('header-logo').style.display = 'block';
             document.getElementById('header-title').textContent = "Gestión Herramientas Bioingeniería";
+            document.getElementById('header-content-box').style.alignItems = 'flex-start';
+            document.getElementById('header-title-container').style.justifyContent = 'flex-start';
             document.getElementById('update-indicator').style.display = 'none';
             document.getElementById('cajas-container').style.display = 'grid';
             
@@ -601,6 +609,8 @@
             document.getElementById('back-btn').classList.add('hidden');
             document.getElementById('header-logo').style.display = 'block';
             document.getElementById('header-title').textContent = "Gestión Herramientas Bioingeniería";
+            document.getElementById('header-content-box').style.alignItems = 'flex-start';
+            document.getElementById('header-title-container').style.justifyContent = 'flex-start';
             document.getElementById('update-indicator').style.display = 'none';
             document.getElementById('action-container').style.display = 'flex';
             currentCaja = null;
@@ -618,6 +628,8 @@
             document.getElementById('back-btn').classList.remove('hidden');
             document.getElementById('header-logo').style.display = 'none';
             document.getElementById('header-title').textContent = caja;
+            document.getElementById('header-content-box').style.alignItems = 'center';
+            document.getElementById('header-title-container').style.justifyContent = 'center';
             document.getElementById('update-indicator').style.display = 'block';
             document.getElementById('action-container').style.display = 'none';
             window.scrollTo(0,0);
